@@ -24,7 +24,8 @@ services:
             - ./log/nginx/:/var/log/nginx/:rw,cached
         links:
             - php72:fpm72
-            - php56:fpm56        
+            - php56:fpm56   
+            - node:node     
         environment:
             - TZ=Asia/Shanghai
         networks:
@@ -84,6 +85,52 @@ services:
         networks:
             web-net:
                 ipv4_address: ${REDIS_IP}
+
+    python2:
+        image: python:2.7
+        volumes:
+            -  ${WORKSPACES}:/data/www/:rw,cached
+        links:
+            - mysql:mysql
+            - redis:redis    
+        working_dir: /data/www/
+        stdin_open: true
+        tty: true
+        networks:
+            web-net:
+                ipv4_address: ${PYTHON2_IP}        
+
+    python3:
+        image: python:3.7
+        volumes:
+            -  ${WORKSPACES}:/data/www/:rw,cached
+        links:
+            - mysql:mysql
+            - redis:redis
+        working_dir: /data/www/
+        stdin_open: true
+        tty: true                  
+        networks:
+            web-net:
+                ipv4_address: ${PYTHON3_IP}
+
+    node:
+        image: node:latest
+        ports:
+            - "${NODE_PORT}:8000"
+        expose:
+            - "8000"    
+        volumes:
+            -  ${WORKSPACES}:/data/www/:rw,cached
+        links:
+            - mysql:mysql
+            - redis:redis
+        working_dir: /data/www/
+        stdin_open: true
+        tty: true        
+        networks:
+            web-net:
+                ipv4_address: ${NODE_IP}
 
 networks:
     web-net:

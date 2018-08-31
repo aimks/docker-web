@@ -1,0 +1,13 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "test node",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "aimks",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
