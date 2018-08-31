@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+
+    portainer:
+        image: portainer/portainer:latest
+        ports:
+            - "9000:9000"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:cached
+            - ./portainer/:/data:cached
+
+    nginx:
+        image: nginx:latest
+        ports:
+            - "80:80"
+        volumes:
+            - ./www/:/data/www/:rw,cached
+            - ./conf/nginx/conf.d:/etc/nginx/conf.d/:ro,cached
+            - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,cached
+            - ./log/nginx/:/var/log/nginx/:rw,cached
+        environment:
+            - TZ=Asia/Shanghai
+
+    php72:
+        image: php:7.2-fpm
+        expose:
+            - "9000"
+        volumes:
+            - ./www/:/data/www/:rw,cached
+            - ./conf/php/php72.ini:/usr/local/etc/php/php.ini:ro,cached
+            - ./conf/php/php-fpm.d/www72.conf:/usr/local/etc/php-fpm.d/www.conf:rw,cached
+            - ./log/php-fpm/:/var/log/php-fpm/:rw,cached
+
+    php56:
+        image: php:5.6-fpm
+        expose:
+            - "9000"
+        volumes:
+            - ./www/:/data/www/:rw,cached
+            - ./conf/php/php56.ini:/usr/local/etc/php/php.ini:ro,cached
+            - ./conf/php/php-fpm.d/www56.conf:/usr/local/etc/php-fpm.d/www.conf:rw,cached
+            - ./log/php-fpm/:/var/log/php-fpm/:rw,cached
+
+    mysql:
+        image: mysql:5.6
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./conf/mysql/my.cnf:/etc/mysql/my.cnf:ro,cached
+            - ./mysql/:/var/lib/mysql/:rw,cached
+            - ./log/mysql/:/var/log/mysql/:rw,cached
+        environment:
+            MYSQL_ROOT_PASSWORD: "123456"
+
+    redis:
+        image: redis:latest
+        ports:
+            - "6379:6379"
+
+networks:
+    web-net:
+        driver: bridge
+        ipam:
+            driver: default
