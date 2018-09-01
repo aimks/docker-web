@@ -72,6 +72,7 @@ services:
             - ./conf/mysql/my.cnf:/etc/mysql/my.cnf:ro,cached
             - ./mysql/:/var/lib/mysql/:rw,cached
             - ./log/mysql/:/var/log/mysql/:rw,cached
+        user: mysql
         environment:
             MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
         networks:

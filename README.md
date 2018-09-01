@@ -121,9 +121,23 @@ $ docker-machine create -d xhyve --engine-opt dns=114.114.114.114 --engine-regis
 ```
 这里可以看到我们新加了--xhyve-experimental-nfs-share参数，这个参数是共享本机的User到虚拟机中，如果要共享整个目录/，需要将整个参数改为--xhyve-experimental-nfs-share-root。
 最后，再次运行docker-compser up ,问题解决。
-
-
-
-
-
+### 2. mysql运行不起来报错chown: changing ownership of '/var/lib/mysql/': Operation not permitted
+因为这个/var/lib/mysql/目录下是使用root建立的，mysql容器对这里目录没有使用权限，mysql容器操作目录时需要使用mysql用户，解决办法就是将mysql容器默认变成mysql用户，将mysql容器加入操作权限user: mysql。
+```
+mysql:
+        image: mysql:5.6
+        ports:
+            - "${MYSQL_PORT}:3306"
+        volumes:
+            - ./conf/mysql/my.cnf:/etc/mysql/my.cnf:ro,cached
+            - ./mysql/:/var/lib/mysql/:rw,cached
+            - ./log/mysql/:/var/log/mysql/:rw,cached
+        user: mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+        networks:
+            web-net:
+                ipv4_address: ${MYSQL_IP}
+```
+我已经把这个命令加入到了项目中，现在不会报这个错误了。
 
